@@ -3,7 +3,7 @@ import java.util.Properties
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-}
+    alias(libs.plugins.kotlin.serialization)}
 
 // ✅ Load keys from local.properties (must be above android block)
 val localProperties = Properties().apply {
@@ -15,12 +15,12 @@ val localProperties = Properties().apply {
 
 android {
     namespace = "com.example.socialmediaapp"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.socialmediaapp"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
@@ -52,12 +52,13 @@ android {
 
 dependencies {
     // ✅ Supabase Kotlin SDK (for Kotlin 2.x)
-    implementation(platform("io.github.jan-tennert.supabase:bom:3.2.5"))
-    implementation("io.github.jan-tennert.supabase:gotrue-kt")
+    implementation("io.github.jan-tennert.supabase:gotrue-kt:2.4.0")
+    implementation("io.github.jan-tennert.supabase:postgrest-kt:2.4.0")
+    implementation("io.github.jan-tennert.supabase:storage-kt:2.4.0")
+    implementation("io.github.jan-tennert.supabase:realtime-kt:2.4.0")
 
-    implementation("io.github.jan-tennert.supabase:postgrest-kt:3.2.5")
-    implementation("io.github.jan-tennert.supabase:storage-kt:3.2.5")
-    implementation("io.github.jan-tennert.supabase:realtime-kt:3.2.5")
+    // Ktor client engine for Android
+    implementation("io.ktor:ktor-client-okhttp:2.3.3")
 
     // ✅ Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
