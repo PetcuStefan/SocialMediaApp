@@ -1,5 +1,6 @@
 package com.example.socialmediaapp.ui.auth
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import com.example.socialmediaapp.data.repository.AuthRepository
 import com.example.socialmediaapp.utils.SessionManager
@@ -10,6 +11,7 @@ import kotlinx.coroutines.launch
 import android.widget.EditText
 import android.widget.TextView
 import com.example.socialmediaapp.R
+import com.example.socialmediaapp.ui.feed.FeedActivity
 
 class AuthActivity : AppCompatActivity() {
 
@@ -32,15 +34,30 @@ class AuthActivity : AppCompatActivity() {
         loginBtn.setOnClickListener {
             lifecycleScope.launch {
                 val success = authRepo.login(username.text.toString(), password.text.toString())
-                status.text = if (success) "Login successful!" else "Invalid credentials."
+                if (success) {
+                    // Navigate to FeedActivity
+                    val intent = Intent(this@AuthActivity, FeedActivity::class.java)
+                    startActivity(intent)
+                    finish() // close AuthActivity
+                } else {
+                    status.text = "Invalid credentials."
+                }
             }
         }
+
 
         registerBtn.setOnClickListener {
             lifecycleScope.launch {
                 val success = authRepo.register(username.text.toString(), password.text.toString())
-                status.text = if (success) "Registration complete!" else "Username already taken."
+                if (success) {
+                    val intent = Intent(this@AuthActivity, FeedActivity::class.java)
+                    startActivity(intent)
+                    finish()
+                } else {
+                    status.text = "Username already taken."
+                }
             }
         }
+
     }
 }
