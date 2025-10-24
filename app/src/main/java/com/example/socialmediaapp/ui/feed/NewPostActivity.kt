@@ -11,7 +11,11 @@ import io.github.jan.supabase.postgrest.from
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
 import java.time.Instant
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 import java.util.UUID
 
 class NewPostActivity : AppCompatActivity() {
@@ -42,25 +46,34 @@ class NewPostActivity : AppCompatActivity() {
     private fun submitPost(title: String, description: String?) {
         val userId = sessionManager.getSession() ?: return
 
+        // Create ISO-8601 timestamp for API 24+
+        val timestamp = SimpleDateFormat(
+            "yyyy-MM-dd'T'HH:mm:ss'Z'",
+            Locale.getDefault()
+        ).apply {
+            timeZone = TimeZone.getTimeZone("UTC")
+        }.format(Date())
+
         val post = Post(
             id = UUID.randomUUID().toString(),
             userId = userId,
             title = title,
             description = description,
-            path = null,
-            createdAt = java.text.SimpleDateFormat(
-                "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", java.util.Locale.getDefault()
-            ).format(java.util.Date())
+            createdAt = timestamp,
+            updatedAt = timestamp,
+            path=null
         )
 
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 App.supabase
                     .from("posts")
-                    .insert(listOf(post))
+                    .insert(post)
 
                 runOnUiThread {
                     Toast.makeText(this@NewPostActivity, "Post created!", Toast.LENGTH_SHORT).show()
+                    // Set result so FeedActivity knows to refresh
+                    setResult(RESULT_OK)
                     finish()
                 }
             } catch (e: Exception) {
@@ -71,5 +84,7 @@ class NewPostActivity : AppCompatActivity() {
             }
         }
     }
+
+
 
 }

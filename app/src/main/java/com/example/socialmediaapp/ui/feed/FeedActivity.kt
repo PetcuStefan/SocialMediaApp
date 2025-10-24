@@ -2,6 +2,7 @@ package com.example.socialmediaapp.ui.feed
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.socialmediaapp.databinding.ActivityFeedBinding
@@ -13,11 +14,21 @@ import io.github.jan.supabase.postgrest.from
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Instant
 
 class FeedActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityFeedBinding
     private lateinit var adapter: PostAdapter
+
+    // ✅ New way: register for activity result
+    private val newPostLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            loadFeed() // Refresh feed after new post is added
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,8 +39,10 @@ class FeedActivity : AppCompatActivity() {
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
         binding.recyclerView.adapter = adapter
 
+        // Launch NewPostActivity using new API
         binding.fabAddPost.setOnClickListener {
-            startActivity(Intent(this, NewPostActivity::class.java))
+            val intent = Intent(this, NewPostActivity::class.java)
+            newPostLauncher.launch(intent)
         }
 
         loadFeed()
@@ -55,10 +68,12 @@ class FeedActivity : AppCompatActivity() {
                     )
                 }.sortedByDescending { it.createdAt }
 
+
                 runOnUiThread { adapter.submitList(postsWithUser) }
             } catch (e: Exception) {
                 e.printStackTrace()
             }
         }
     }
+
 }
