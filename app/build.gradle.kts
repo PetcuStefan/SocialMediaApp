@@ -52,13 +52,15 @@ android {
 
 dependencies {
     // ✅ Supabase Kotlin SDK (for Kotlin 2.x)
-    implementation("io.github.jan-tennert.supabase:gotrue-kt:2.4.0")
     implementation("io.github.jan-tennert.supabase:postgrest-kt:2.4.0")
     implementation("io.github.jan-tennert.supabase:storage-kt:2.4.0")
     implementation("io.github.jan-tennert.supabase:realtime-kt:2.4.0")
 
     // Ktor client engine for Android
     implementation("io.ktor:ktor-client-okhttp:2.3.3")
+    implementation("androidx.security:security-crypto:1.1.0-alpha04")
+    implementation("at.favre.lib:bcrypt:0.10.2")
+
 
     // ✅ Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
@@ -70,6 +72,7 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.material3)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
