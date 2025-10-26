@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 import android.widget.EditText
 import android.widget.TextView
 import com.example.socialmediaapp.R
-import com.example.socialmediaapp.ui.feed.FeedActivity
+import com.example.socialmediaapp.ui.main.MainActivity
 
 class AuthActivity : AppCompatActivity() {
 
@@ -36,7 +36,7 @@ class AuthActivity : AppCompatActivity() {
                 val success = authRepo.login(username.text.toString(), password.text.toString())
                 if (success) {
                     // Navigate to FeedActivity
-                    val intent = Intent(this@AuthActivity, FeedActivity::class.java)
+                    val intent = Intent(this@AuthActivity, MainActivity::class.java)
                     startActivity(intent)
                     finish() // close AuthActivity
                 } else {
@@ -50,7 +50,7 @@ class AuthActivity : AppCompatActivity() {
             lifecycleScope.launch {
                 val success = authRepo.register(username.text.toString(), password.text.toString())
                 if (success) {
-                    val intent = Intent(this@AuthActivity, FeedActivity::class.java)
+                    val intent = Intent(this@AuthActivity, MainActivity::class.java)
                     startActivity(intent)
                     finish()
                 } else {

@@ -24,8 +24,8 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ui.feed.FeedActivity" />
         <activity android:name=".ui.feed.NewPostActivity" />
+        <activity android:name=".ui.main.MainActivity" />
     </application>
 
 </manifest>

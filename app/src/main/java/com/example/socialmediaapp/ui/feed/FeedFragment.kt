@@ -2,10 +2,14 @@ package com.example.socialmediaapp.ui.feed
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.socialmediaapp.databinding.ActivityFeedBinding
+import com.example.socialmediaapp.databinding.FragmentFeedBinding
 import com.example.socialmediaapp.data.model.dto.PostWithUser
 import com.example.socialmediaapp.data.model.entity.Post
 import com.example.socialmediaapp.data.model.entity.User
@@ -14,38 +18,39 @@ import io.github.jan.supabase.postgrest.from
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Instant
 
-class FeedActivity : AppCompatActivity() {
+class FeedFragment : Fragment() {
 
-    private lateinit var binding: ActivityFeedBinding
+    private var _binding: FragmentFeedBinding? = null
+    private val binding get() = _binding!!
     private lateinit var adapter: PostAdapter
 
-    // ✅ New way: register for activity result
     private val newPostLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
-        if (result.resultCode == RESULT_OK) {
-            loadFeed() // Refresh feed after new post is added
+        if (result.resultCode == AppCompatActivity.RESULT_OK) {
+            loadFeed()
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivityFeedBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentFeedBinding.inflate(inflater, container, false)
 
         adapter = PostAdapter()
-        binding.recyclerView.layoutManager = LinearLayoutManager(this)
+        binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerView.adapter = adapter
 
-        // Launch NewPostActivity using new API
         binding.fabAddPost.setOnClickListener {
-            val intent = Intent(this, NewPostActivity::class.java)
+            val intent = Intent(requireContext(), NewPostActivity::class.java)
             newPostLauncher.launch(intent)
         }
 
         loadFeed()
+        return binding.root
     }
 
     private fun loadFeed() {
@@ -68,12 +73,17 @@ class FeedActivity : AppCompatActivity() {
                     )
                 }.sortedByDescending { it.createdAt }
 
-
-                runOnUiThread { adapter.submitList(postsWithUser) }
+                requireActivity().runOnUiThread {
+                    adapter.submitList(postsWithUser)
+                }
             } catch (e: Exception) {
                 e.printStackTrace()
             }
         }
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 }
