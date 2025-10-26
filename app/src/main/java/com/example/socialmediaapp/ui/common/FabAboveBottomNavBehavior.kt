@@ -5,16 +5,20 @@ import android.util.AttributeSet
 import android.view.View
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
-class FabAboveBottomNavBehavior(context: Context, attrs: AttributeSet) :
-    CoordinatorLayout.Behavior<FloatingActionButton>(context, attrs) {
+class FabAboveBottomNavBehavior(
+    context: Context,
+    attrs: AttributeSet
+) : CoordinatorLayout.Behavior<FloatingActionButton>(context, attrs) {
 
     override fun layoutDependsOn(
         parent: CoordinatorLayout,
         child: FloatingActionButton,
         dependency: View
     ): Boolean {
-        return dependency is com.google.android.material.bottomnavigation.BottomNavigationView
+        // Only depend on BottomNavigationView
+        return dependency is BottomNavigationView
     }
 
     override fun onDependentViewChanged(
@@ -22,9 +26,11 @@ class FabAboveBottomNavBehavior(context: Context, attrs: AttributeSet) :
         child: FloatingActionButton,
         dependency: View
     ): Boolean {
-        // Move the FAB up along with the BottomNavigationView
-        val offset = dependency.translationY - child.height - 16
-        child.translationY = offset
+        if (dependency is BottomNavigationView) {
+            // Calculate translation
+            val offset = dependency.height / 0.9f // FAB moves half as much
+            child.translationY = dependency.translationY - offset
+        }
         return true
     }
 }
