@@ -20,6 +20,17 @@ class AuthActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        sessionManager = SessionManager(this)
+        val currentUserId = sessionManager.getSession() // getSession() returns userId if logged in
+
+        if (currentUserId != null) {
+            // User already logged in → go straight to MainActivity
+            startActivity(Intent(this, MainActivity::class.java))
+            finish() // close AuthActivity so back button doesn't return here
+            return
+        }
+
         setContentView(R.layout.activity_auth)
 
         sessionManager = SessionManager(this)
