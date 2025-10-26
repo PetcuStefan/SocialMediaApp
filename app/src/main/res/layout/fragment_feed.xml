@@ -9,17 +9,8 @@
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="8dp" />
-
-    <!-- Floating action button anchored ABOVE bottom nav -->
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabAddPost"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
-        app:backgroundTint="@color/teal"
-        app:srcCompat="@drawable/ic_add" />
+        android:padding="8dp"
+        android:nestedScrollingEnabled="true"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

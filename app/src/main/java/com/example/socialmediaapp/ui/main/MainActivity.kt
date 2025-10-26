@@ -19,12 +19,19 @@ class MainActivity : AppCompatActivity() {
 
         // Default fragment
         loadFragment(FeedFragment())
+        showFab { /* default click listener if needed */ }
 
-        // Handle bottom navigation item clicks
+        // Handle bottom navigation clicks
         binding.bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.nav_feed -> loadFragment(FeedFragment())
-                R.id.nav_profile -> loadFragment(ProfileFragment())
+                R.id.nav_feed -> {
+                    loadFragment(FeedFragment())
+                    showFab { /* handled in FeedFragment */ }
+                }
+                R.id.nav_profile -> {
+                    loadFragment(ProfileFragment())
+                    hideFab()
+                }
             }
             true
         }
@@ -34,5 +41,16 @@ class MainActivity : AppCompatActivity() {
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, fragment)
             .commit()
+    }
+
+    /** Show the FAB and assign a click listener */
+    fun showFab(clickListener: () -> Unit) {
+        binding.fabAddPost.show()
+        binding.fabAddPost.setOnClickListener { clickListener() }
+    }
+
+    /** Hide the FAB */
+    fun hideFab() {
+        binding.fabAddPost.hide()
     }
 }

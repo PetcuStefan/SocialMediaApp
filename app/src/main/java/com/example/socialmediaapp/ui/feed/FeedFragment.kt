@@ -6,18 +6,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.socialmediaapp.databinding.FragmentFeedBinding
+import com.example.socialmediaapp.App
 import com.example.socialmediaapp.data.model.dto.PostWithUser
 import com.example.socialmediaapp.data.model.entity.Post
 import com.example.socialmediaapp.data.model.entity.User
-import com.example.socialmediaapp.App
-import io.github.jan.supabase.postgrest.from
+import com.example.socialmediaapp.databinding.FragmentFeedBinding
+import com.example.socialmediaapp.ui.main.MainActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import androidx.appcompat.app.AppCompatActivity
+import io.github.jan.supabase.postgrest.from
 
 class FeedFragment : Fragment() {
 
@@ -25,6 +26,7 @@ class FeedFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var adapter: PostAdapter
 
+    // Activity Result API for NewPostActivity
     private val newPostLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -44,7 +46,8 @@ class FeedFragment : Fragment() {
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerView.adapter = adapter
 
-        binding.fabAddPost.setOnClickListener {
+        // Show FAB in MainActivity and assign click to launch NewPostActivity
+        (requireActivity() as? MainActivity)?.showFab {
             val intent = Intent(requireContext(), NewPostActivity::class.java)
             newPostLauncher.launch(intent)
         }
@@ -53,6 +56,7 @@ class FeedFragment : Fragment() {
         return binding.root
     }
 
+    /** Fetch posts from Supabase and map to PostWithUser */
     private fun loadFeed() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
