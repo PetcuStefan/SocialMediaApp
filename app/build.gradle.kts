@@ -3,7 +3,8 @@ import java.util.Properties
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.serialization)}
+    alias(libs.plugins.kotlin.serialization)
+    id("org.jetbrains.kotlin.kapt")}
 
 // ✅ Load keys from local.properties (must be above android block)
 val localProperties = Properties().apply {
@@ -62,10 +63,16 @@ dependencies {
     implementation("androidx.security:security-crypto:1.1.0-alpha04")
     implementation("at.favre.lib:bcrypt:0.10.2")
 
+    implementation("io.coil-kt:coil:2.4.0")
+
+
 
     // ✅ Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
+
+    implementation("com.github.bumptech.glide:glide:4.15.1")
+    kapt("com.github.bumptech.glide:compiler:4.15.1")
 
     // AndroidX + Material
     implementation(libs.androidx.core.ktx)

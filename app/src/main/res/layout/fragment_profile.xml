@@ -13,6 +13,16 @@
         android:layout_height="120dp"
         android:src="@drawable/ic_profile_placeholder"
         android:contentDescription="Profile Picture"
+        android:layout_marginBottom="16dp"
+        android:adjustViewBounds="true"
+        android:scaleType="centerCrop"/>
+
+    <!-- Choose Profile Picture button -->
+    <Button
+        android:id="@+id/btnChooseProfilePicture"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Choose Profile Picture"
         android:layout_marginBottom="24dp" />
 
     <!-- Username -->
