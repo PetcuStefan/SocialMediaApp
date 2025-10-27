@@ -26,6 +26,34 @@
         android:minLines="3"
         android:background="@drawable/edit_text_background"
         android:padding="12dp"
+        android:layout_marginBottom="12dp"/>
+
+    <!-- Media button -->
+    <Button
+        android:id="@+id/btnPickMedia"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Choose Image"
+        android:layout_marginBottom="8dp"/>
+
+    <!-- Selected file name -->
+    <TextView
+        android:id="@+id/tvSelectedMedia"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="No media selected"
+        android:textColor="@android:color/darker_gray"
+        android:layout_marginBottom="12dp"/>
+
+    <!-- External link -->
+    <EditText
+        android:id="@+id/etLink"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Or enter a link"
+        android:inputType="textUri"
+        android:background="@drawable/edit_text_background"
+        android:padding="12dp"
         android:layout_marginBottom="16dp"/>
 
     <!-- Submit Button -->
