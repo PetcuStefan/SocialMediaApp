@@ -22,6 +22,8 @@ import kotlinx.coroutines.withContext
 import java.util.UUID
 import android.widget.LinearLayout
 import android.widget.ImageView
+import android.view.ViewOutlineProvider
+import android.graphics.Outline
 
 class PostDetailActivity : AppCompatActivity() {
 
@@ -150,14 +152,14 @@ class PostDetailActivity : AppCompatActivity() {
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
                 ).apply {
-                    setMargins(0, 8, 0, 8)
+                    setMargins(0, 12, 0, 12) // More vertical spacing
                 }
-                radius = 12f
-                cardElevation = 4f
-                setContentPadding(16, 12, 16, 12)
+                radius = 16f  // Slightly bigger rounding
+                cardElevation = 6f  // Slightly higher elevation
+                setContentPadding(20, 16, 20, 16) // More padding
             }
 
-            // Horizontal LinearLayout for profile pic + comment
+            // Horizontal layout for profile picture + comment
             val horizontalLayout = LinearLayout(this).apply {
                 layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
@@ -166,16 +168,23 @@ class PostDetailActivity : AppCompatActivity() {
                 orientation = LinearLayout.HORIZONTAL
             }
 
-            // Profile picture
+            // Profile picture (round)
             val ivProfile = ImageView(this).apply {
-                layoutParams = LinearLayout.LayoutParams(60, 60).apply {
-                    setMargins(0, 0, 12, 0)
+                layoutParams = LinearLayout.LayoutParams(80, 80).apply { // bigger size
+                    setMargins(0, 0, 16, 0)
                 }
                 scaleType = ImageView.ScaleType.CENTER_CROP
-                setImageResource(R.drawable.ic_profile_placeholder) // fallback
+                setImageResource(R.drawable.ic_profile_placeholder)
+                // make it round
+                clipToOutline = true
+                outlineProvider = object : ViewOutlineProvider() {
+                    override fun getOutline(view: View, outline: Outline) {
+                        outline.setOval(0, 0, view.width, view.height)
+                    }
+                }
             }
 
-            // Load profile picture from Supabase storage if exists
+            // Load profile picture from Supabase storage
             comment.user.profilePicture?.let { path ->
                 if (path.isNotEmpty()) {
                     val url = App.supabase.storage.from("profile-pictures").publicUrl(path)
@@ -197,16 +206,16 @@ class PostDetailActivity : AppCompatActivity() {
 
             val tvUser = TextView(this).apply {
                 text = comment.user.username
-                textSize = 14f
+                textSize = 16f
                 setTextColor(resources.getColor(android.R.color.holo_blue_dark, null))
                 setTypeface(typeface, android.graphics.Typeface.BOLD)
             }
 
             val tvContent = TextView(this).apply {
                 text = comment.content
-                textSize = 14f
+                textSize = 15f
                 setTextColor(resources.getColor(android.R.color.black, null))
-                setPadding(0, 4, 0, 0)
+                setPadding(0, 6, 0, 0)
             }
 
             verticalLayout.addView(tvUser)
@@ -220,8 +229,6 @@ class PostDetailActivity : AppCompatActivity() {
             binding.commentsContainer.addView(cardView)
         }
     }
-
-
 
     private fun postComment(content: String) {
         if (postId == null || userId == null) {
