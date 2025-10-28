@@ -42,7 +42,17 @@ class FeedFragment : Fragment() {
     ): View {
         _binding = FragmentFeedBinding.inflate(inflater, container, false)
 
-        adapter = PostAdapter()
+        adapter = PostAdapter { post ->
+            val intent = Intent(requireContext(), PostDetailActivity::class.java).apply {
+                putExtra("post_id", post.id)
+                putExtra("username", post.username)
+                putExtra("title", post.title)
+                putExtra("description", post.description)
+                putExtra("path", post.path)
+            }
+            startActivity(intent)
+        }
+        binding.recyclerView.adapter = adapter
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerView.adapter = adapter
 

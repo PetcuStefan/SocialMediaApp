@@ -26,6 +26,7 @@
 
         <activity android:name=".ui.feed.NewPostActivity" />
         <activity android:name=".ui.main.MainActivity" />
+        <activity android:name=".ui.feed.PostDetailActivity" />
     </application>
 
 </manifest>

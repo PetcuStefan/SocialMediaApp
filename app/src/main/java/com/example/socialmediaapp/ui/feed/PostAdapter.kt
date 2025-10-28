@@ -1,14 +1,20 @@
 package com.example.socialmediaapp.ui.feed
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import coil.load
+import com.example.socialmediaapp.App
 import com.example.socialmediaapp.data.model.dto.PostWithUser
 import com.example.socialmediaapp.databinding.ItemPostBinding
+import io.github.jan.supabase.storage.storage
 
-class PostAdapter : ListAdapter<PostWithUser, PostAdapter.PostViewHolder>(DiffCallback()) {
+class PostAdapter(
+    private val onPostClick: (PostWithUser) -> Unit
+) : ListAdapter<PostWithUser, PostAdapter.PostViewHolder>(DiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
         val binding = ItemPostBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -26,6 +32,22 @@ class PostAdapter : ListAdapter<PostWithUser, PostAdapter.PostViewHolder>(DiffCa
             binding.usernameTextView.text = post.username
             binding.titleTextView.text = post.title
             binding.descriptionTextView.text = post.description ?: ""
+
+            // Load image (if exists)
+            if (!post.path.isNullOrEmpty()) {
+                val imageUrl = if (post.path.startsWith("http"))
+                    post.path
+                else
+                    App.supabase.storage.from("post-media").publicUrl(post.path!!)
+
+                binding.postImageView.load(imageUrl)
+                binding.postImageView.visibility = View.VISIBLE
+            } else {
+                binding.postImageView.visibility = View.GONE
+            }
+
+            // Handle click
+            binding.root.setOnClickListener { onPostClick(post) }
         }
     }
 
