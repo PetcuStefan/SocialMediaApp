@@ -21,6 +21,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.UUID
 import android.widget.LinearLayout
+import android.widget.ImageView
 
 class PostDetailActivity : AppCompatActivity() {
 
@@ -143,7 +144,7 @@ class PostDetailActivity : AppCompatActivity() {
         binding.commentsContainer.removeAllViews()
 
         for (comment in comments) {
-            // Create CardView
+            // CardView for each comment
             val cardView = androidx.cardview.widget.CardView(this).apply {
                 layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
@@ -156,8 +157,37 @@ class PostDetailActivity : AppCompatActivity() {
                 setContentPadding(16, 12, 16, 12)
             }
 
-            // Create LinearLayout inside the CardView
-            val ll = LinearLayout(this).apply {
+            // Horizontal LinearLayout for profile pic + comment
+            val horizontalLayout = LinearLayout(this).apply {
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                )
+                orientation = LinearLayout.HORIZONTAL
+            }
+
+            // Profile picture
+            val ivProfile = ImageView(this).apply {
+                layoutParams = LinearLayout.LayoutParams(60, 60).apply {
+                    setMargins(0, 0, 12, 0)
+                }
+                scaleType = ImageView.ScaleType.CENTER_CROP
+                setImageResource(R.drawable.ic_profile_placeholder) // fallback
+            }
+
+            // Load profile picture from Supabase storage if exists
+            comment.user.profilePicture?.let { path ->
+                if (path.isNotEmpty()) {
+                    val url = App.supabase.storage.from("profile-pictures").publicUrl(path)
+                    ivProfile.load(url) {
+                        placeholder(R.drawable.ic_profile_placeholder)
+                        error(R.drawable.ic_profile_placeholder)
+                    }
+                }
+            }
+
+            // Vertical layout for username + comment
+            val verticalLayout = LinearLayout(this).apply {
                 layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
@@ -165,7 +195,6 @@ class PostDetailActivity : AppCompatActivity() {
                 orientation = LinearLayout.VERTICAL
             }
 
-            // Username TextView
             val tvUser = TextView(this).apply {
                 text = comment.user.username
                 textSize = 14f
@@ -173,7 +202,6 @@ class PostDetailActivity : AppCompatActivity() {
                 setTypeface(typeface, android.graphics.Typeface.BOLD)
             }
 
-            // Content TextView
             val tvContent = TextView(this).apply {
                 text = comment.content
                 textSize = 14f
@@ -181,14 +209,19 @@ class PostDetailActivity : AppCompatActivity() {
                 setPadding(0, 4, 0, 0)
             }
 
-            ll.addView(tvUser)
-            ll.addView(tvContent)
-            cardView.addView(ll)
+            verticalLayout.addView(tvUser)
+            verticalLayout.addView(tvContent)
 
-            // Add card to container
+            horizontalLayout.addView(ivProfile)
+            horizontalLayout.addView(verticalLayout)
+
+            cardView.addView(horizontalLayout)
+
             binding.commentsContainer.addView(cardView)
         }
     }
+
+
 
     private fun postComment(content: String) {
         if (postId == null || userId == null) {
