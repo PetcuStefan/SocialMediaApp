@@ -25,9 +25,9 @@ class PostDetailActivity : AppCompatActivity() {
         val description = intent.getStringExtra("description")
         val path = intent.getStringExtra("path")
 
-        binding.tvUsername.text = username
         binding.tvTitle.text = title
         binding.tvDescription.text = description
+        binding.tvPostInfo.text = "Posted by: ${username}"
 
         if (!path.isNullOrEmpty()) {
             if (path.endsWith(".mp4") || path.endsWith(".mov")) {
