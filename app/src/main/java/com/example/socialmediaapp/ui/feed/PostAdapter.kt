@@ -29,7 +29,7 @@ class PostAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(post: PostWithUser) {
-            binding.usernameTextView.text = post.username
+            binding.usernameTextView.text = "Posted by: ${post.username}"
             binding.titleTextView.text = post.title
             binding.descriptionTextView.text = post.description ?: ""
 

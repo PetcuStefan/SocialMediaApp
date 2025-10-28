@@ -4,24 +4,17 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
-    app:cardElevation="4dp"
-    app:cardCornerRadius="8dp">
+    app:cardElevation="6dp"
+    app:cardCornerRadius="8dp"
+    android:foreground="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="16dp">
-
-        <!-- Username -->
-        <TextView
-            android:id="@+id/usernameTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Username"
-            android:textStyle="bold"
-            android:textColor="@android:color/black"
-            android:textSize="16sp" />
 
         <!-- Title -->
         <TextView
@@ -30,8 +23,7 @@
             android:layout_height="wrap_content"
             android:text="Post Title"
             android:textStyle="bold"
-            android:textSize="14sp"
-            android:layout_marginTop="4dp"
+            android:textSize="16sp"
             android:textColor="@android:color/black" />
 
         <!-- Description -->
@@ -42,7 +34,9 @@
             android:text="Post description goes here"
             android:textSize="14sp"
             android:layout_marginTop="4dp"
-            android:textColor="@android:color/darker_gray" />
+            android:textColor="@android:color/darker_gray"
+            android:maxLines="3"
+            android:ellipsize="end" />
 
         <!-- Media (optional) -->
         <ImageView
@@ -52,7 +46,26 @@
             android:layout_marginTop="8dp"
             android:scaleType="centerCrop"
             android:adjustViewBounds="true"
-            android:visibility="gone" />
+            android:visibility="gone"
+            android:background="@drawable/rounded_image_bg" />
+
+        <!-- Divider line -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:background="@android:color/darker_gray" />
+
+        <!-- Author at the bottom -->
+        <TextView
+            android:id="@+id/usernameTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Posted by: Username"
+            android:textStyle="italic"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="12sp" />
 
     </LinearLayout>
 </androidx.cardview.widget.CardView>
