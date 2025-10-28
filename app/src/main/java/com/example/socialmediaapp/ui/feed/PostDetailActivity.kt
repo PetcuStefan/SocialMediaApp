@@ -20,6 +20,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.UUID
+import android.widget.LinearLayout
 
 class PostDetailActivity : AppCompatActivity() {
 
@@ -142,11 +143,50 @@ class PostDetailActivity : AppCompatActivity() {
         binding.commentsContainer.removeAllViews()
 
         for (comment in comments) {
-            val tv = TextView(this)
-            tv.text = "${comment.user.username}: ${comment.content}"
-            tv.textSize = 14f
-            tv.setPadding(0, 8, 0, 8)
-            binding.commentsContainer.addView(tv)
+            // Create CardView
+            val cardView = androidx.cardview.widget.CardView(this).apply {
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    setMargins(0, 8, 0, 8)
+                }
+                radius = 12f
+                cardElevation = 4f
+                setContentPadding(16, 12, 16, 12)
+            }
+
+            // Create LinearLayout inside the CardView
+            val ll = LinearLayout(this).apply {
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                )
+                orientation = LinearLayout.VERTICAL
+            }
+
+            // Username TextView
+            val tvUser = TextView(this).apply {
+                text = comment.user.username
+                textSize = 14f
+                setTextColor(resources.getColor(android.R.color.holo_blue_dark, null))
+                setTypeface(typeface, android.graphics.Typeface.BOLD)
+            }
+
+            // Content TextView
+            val tvContent = TextView(this).apply {
+                text = comment.content
+                textSize = 14f
+                setTextColor(resources.getColor(android.R.color.black, null))
+                setPadding(0, 4, 0, 0)
+            }
+
+            ll.addView(tvUser)
+            ll.addView(tvContent)
+            cardView.addView(ll)
+
+            // Add card to container
+            binding.commentsContainer.addView(cardView)
         }
     }
 

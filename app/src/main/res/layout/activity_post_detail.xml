@@ -81,7 +81,7 @@
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
-        <!-- Comments section -->
+        <!-- Comments section header -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -91,10 +91,12 @@
             android:layout_marginTop="16dp"
             android:layout_marginBottom="8dp" />
 
+        <!-- Add comment input -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_marginBottom="12dp">
 
             <EditText
                 android:id="@+id/etAddComment"
@@ -103,14 +105,15 @@
                 android:layout_height="wrap_content"
                 android:hint="Add a comment..."
                 android:inputType="text"
-                android:padding="8dp" />
+                android:padding="8dp"
+                android:background="@drawable/comment_input_bg"
+                android:layout_marginEnd="8dp"/>
 
             <Button
                 android:id="@+id/btnPostComment"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Post"
-                android:layout_marginStart="8dp" />
+                android:text="Post" />
         </LinearLayout>
 
         <!-- Comment list container -->
@@ -118,7 +121,8 @@
             android:id="@+id/commentsContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginTop="8dp" />
-        </LinearLayout>
+            android:orientation="vertical" />
+
+    </LinearLayout>
 </ScrollView>
+
