@@ -406,19 +406,32 @@ class PostDetailActivity : AppCompatActivity() {
         horizontalLayout.addView(verticalLayout)
         cardView.addView(horizontalLayout)
 
-        // Create container for child replies
+        // Container for nested replies
         val nestedRepliesContainer = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             )
+            visibility = View.GONE // hidden by default
         }
 
-        // Recursively render replies to this reply
+        // Find nested replies
         val nestedReplies = allComments.filter { it.upperId == reply.id }
-        for (nested in nestedReplies) {
-            nestedRepliesContainer.addView(createReplyView(nested, allComments, level + 1))
+
+        // Click on card to toggle its nested replies
+        if (nestedReplies.isNotEmpty()) {
+            cardView.setOnClickListener {
+                if (nestedRepliesContainer.visibility == View.VISIBLE) {
+                    nestedRepliesContainer.visibility = View.GONE
+                } else {
+                    nestedRepliesContainer.visibility = View.VISIBLE
+                    nestedRepliesContainer.removeAllViews()
+                    for (nested in nestedReplies) {
+                        nestedRepliesContainer.addView(createReplyView(nested, allComments, level + 1))
+                    }
+                }
+            }
         }
 
         // Combine card + nested replies
@@ -430,6 +443,7 @@ class PostDetailActivity : AppCompatActivity() {
 
         return wrapper
     }
+
 
 
 
