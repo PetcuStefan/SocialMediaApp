@@ -7,6 +7,7 @@ import kotlinx.serialization.Serializable
 data class CommentWithUser(
     val id: String,
     val content: String,
+    val upperId: String? = null,
     val createdAt: String? = null,
     val user: User
 )

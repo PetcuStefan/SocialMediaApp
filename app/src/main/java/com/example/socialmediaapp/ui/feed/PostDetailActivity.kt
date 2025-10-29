@@ -119,6 +119,7 @@ class PostDetailActivity : AppCompatActivity() {
                                 id = comment.id,
                                 content = comment.content,
                                 createdAt = comment.createdAt,
+                                upperId = comment.upperId, // ✅ Add this
                                 user = it
                             )
                         }
@@ -145,90 +146,292 @@ class PostDetailActivity : AppCompatActivity() {
     private fun displayComments(comments: List<com.example.socialmediaapp.data.model.dto.CommentWithUser>) {
         binding.commentsContainer.removeAllViews()
 
-        for (comment in comments) {
-            // CardView for each comment
-            val cardView = androidx.cardview.widget.CardView(this).apply {
-                layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-                ).apply {
-                    setMargins(0, 12, 0, 12) // More vertical spacing
-                }
-                radius = 16f  // Slightly bigger rounding
-                cardElevation = 6f  // Slightly higher elevation
-                setContentPadding(20, 16, 20, 16) // More padding
-            }
+        // Only show top-level comments initially
+        val topLevelComments = comments.filter { it.upperId == null }
 
-            // Horizontal layout for profile picture + comment
-            val horizontalLayout = LinearLayout(this).apply {
-                layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-                )
-                orientation = LinearLayout.HORIZONTAL
-            }
-
-            // Profile picture (round)
-            val ivProfile = ImageView(this).apply {
-                layoutParams = LinearLayout.LayoutParams(80, 80).apply { // bigger size
-                    setMargins(0, 0, 16, 0)
-                }
-                scaleType = ImageView.ScaleType.CENTER_CROP
-                setImageResource(R.drawable.ic_profile_placeholder)
-                // make it round
-                clipToOutline = true
-                outlineProvider = object : ViewOutlineProvider() {
-                    override fun getOutline(view: View, outline: Outline) {
-                        outline.setOval(0, 0, view.width, view.height)
-                    }
-                }
-            }
-
-            // Load profile picture from Supabase storage
-            comment.user.profilePicture?.let { path ->
-                if (path.isNotEmpty()) {
-                    val url = App.supabase.storage.from("profile-pictures").publicUrl(path)
-                    ivProfile.load(url) {
-                        placeholder(R.drawable.ic_profile_placeholder)
-                        error(R.drawable.ic_profile_placeholder)
-                    }
-                }
-            }
-
-            // Vertical layout for username + comment
-            val verticalLayout = LinearLayout(this).apply {
-                layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-                )
-                orientation = LinearLayout.VERTICAL
-            }
-
-            val tvUser = TextView(this).apply {
-                text = comment.user.username
-                textSize = 16f
-                setTextColor(resources.getColor(android.R.color.holo_blue_dark, null))
-                setTypeface(typeface, android.graphics.Typeface.BOLD)
-            }
-
-            val tvContent = TextView(this).apply {
-                text = comment.content
-                textSize = 15f
-                setTextColor(resources.getColor(android.R.color.black, null))
-                setPadding(0, 6, 0, 0)
-            }
-
-            verticalLayout.addView(tvUser)
-            verticalLayout.addView(tvContent)
-
-            horizontalLayout.addView(ivProfile)
-            horizontalLayout.addView(verticalLayout)
-
-            cardView.addView(horizontalLayout)
-
-            binding.commentsContainer.addView(cardView)
+        for (comment in topLevelComments) {
+            addCommentView(comment, comments, 0)
         }
     }
+
+    // Recursive comment renderer
+    private fun addCommentView(
+        comment: com.example.socialmediaapp.data.model.dto.CommentWithUser,
+        allComments: List<com.example.socialmediaapp.data.model.dto.CommentWithUser>,
+        level: Int
+    ) {
+        val context = this
+
+        // CardView for comment
+        val cardView = androidx.cardview.widget.CardView(context).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                setMargins(level * 40, 12, 0, 12) // indent replies
+            }
+            radius = 16f
+            cardElevation = 6f
+            setContentPadding(20, 16, 20, 16)
+        }
+
+        // Horizontal layout for profile + content
+        val horizontalLayout = LinearLayout(context).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            orientation = LinearLayout.HORIZONTAL
+        }
+
+        // Profile picture
+        val ivProfile = ImageView(context).apply {
+            layoutParams = LinearLayout.LayoutParams(80, 80).apply { setMargins(0, 0, 16, 0) }
+            scaleType = ImageView.ScaleType.CENTER_CROP
+            clipToOutline = true
+            outlineProvider = object : ViewOutlineProvider() {
+                override fun getOutline(view: View, outline: Outline) {
+                    outline.setOval(0, 0, view.width, view.height)
+                }
+            }
+            setImageResource(R.drawable.ic_profile_placeholder)
+        }
+
+        comment.user.profilePicture?.let { path ->
+            if (path.isNotEmpty()) {
+                val url = App.supabase.storage.from("profile-pictures").publicUrl(path)
+                ivProfile.load(url) {
+                    placeholder(R.drawable.ic_profile_placeholder)
+                    error(R.drawable.ic_profile_placeholder)
+                }
+            }
+        }
+
+        val verticalLayout = LinearLayout(context).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            orientation = LinearLayout.VERTICAL
+        }
+
+        val tvUser = TextView(context).apply {
+            text = comment.user.username
+            textSize = 16f
+            setTextColor(resources.getColor(android.R.color.holo_blue_dark, null))
+            setTypeface(typeface, android.graphics.Typeface.BOLD)
+        }
+
+        val tvContent = TextView(context).apply {
+            text = comment.content
+            textSize = 15f
+            setTextColor(resources.getColor(android.R.color.black, null))
+            setPadding(0, 6, 0, 0)
+        }
+
+        val btnReply = TextView(context).apply {
+            text = "Reply"
+            textSize = 14f
+            setTextColor(resources.getColor(android.R.color.holo_blue_dark, null))
+            setPadding(0, 8, 0, 0)
+            setOnClickListener {
+                // Simple input dialog for reply
+                val input = android.widget.EditText(context)
+                input.hint = "Write a reply..."
+                input.setPadding(32, 16, 32, 16)
+                input.background = resources.getDrawable(R.drawable.comment_input_bg, null)
+
+                val dialog = android.app.AlertDialog.Builder(context)
+                    .setTitle("Reply to ${comment.user.username}")
+                    .setView(input)
+                    .setPositiveButton("Post") { _, _ ->
+                        val replyText = input.text.toString().trim()
+                        if (replyText.isNotEmpty()) {
+                            replyToComment(replyText, comment.id)
+                        } else {
+                            Toast.makeText(context, "Reply cannot be empty", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                    .setNegativeButton("Cancel", null)
+                    .create()
+                dialog.show()
+            }
+        }
+
+
+        verticalLayout.addView(tvUser)
+        verticalLayout.addView(tvContent)
+        verticalLayout.addView(btnReply)
+        horizontalLayout.addView(ivProfile)
+        horizontalLayout.addView(verticalLayout)
+        cardView.addView(horizontalLayout)
+
+        // Add comment view
+        binding.commentsContainer.addView(cardView)
+
+        // Replies container
+        val repliesContainer = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            visibility = View.GONE
+        }
+        binding.commentsContainer.addView(repliesContainer)
+
+        // On click, toggle replies
+        cardView.setOnClickListener {
+            if (repliesContainer.visibility == View.VISIBLE) {
+                repliesContainer.visibility = View.GONE
+            } else {
+                repliesContainer.visibility = View.VISIBLE
+                repliesContainer.removeAllViews()
+
+                val replies = allComments.filter { it.upperId == comment.id }
+                for (reply in replies) {
+                    val replyView = createReplyView(reply, allComments, level + 1)
+                    repliesContainer.addView(replyView)
+                }
+            }
+        }
+    }
+
+    private fun createReplyView(
+        reply: com.example.socialmediaapp.data.model.dto.CommentWithUser,
+        allComments: List<com.example.socialmediaapp.data.model.dto.CommentWithUser>,
+        level: Int
+    ): View {
+        val context = this
+
+        // Reply card (same as main comment style)
+        val cardView = androidx.cardview.widget.CardView(context).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                setMargins(level * 60, 8, 0, 8) // indent replies more for each level
+            }
+            radius = 16f
+            cardElevation = 4f
+            setContentPadding(20, 16, 20, 16)
+        }
+
+        val horizontalLayout = LinearLayout(context).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            orientation = LinearLayout.HORIZONTAL
+        }
+
+        // Profile image
+        val ivProfile = ImageView(context).apply {
+            layoutParams = LinearLayout.LayoutParams(70, 70).apply { setMargins(0, 0, 16, 0) }
+            scaleType = ImageView.ScaleType.CENTER_CROP
+            clipToOutline = true
+            outlineProvider = object : ViewOutlineProvider() {
+                override fun getOutline(view: View, outline: Outline) {
+                    outline.setOval(0, 0, view.width, view.height)
+                }
+            }
+            setImageResource(R.drawable.ic_profile_placeholder)
+        }
+
+        reply.user.profilePicture?.let { path ->
+            if (path.isNotEmpty()) {
+                val url = App.supabase.storage.from("profile-pictures").publicUrl(path)
+                ivProfile.load(url) {
+                    placeholder(R.drawable.ic_profile_placeholder)
+                    error(R.drawable.ic_profile_placeholder)
+                }
+            }
+        }
+
+        // Text section (username + content + reply button)
+        val verticalLayout = LinearLayout(context).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            orientation = LinearLayout.VERTICAL
+        }
+
+        val tvUser = TextView(context).apply {
+            text = reply.user.username
+            textSize = 15f
+            setTextColor(resources.getColor(android.R.color.holo_blue_dark, null))
+            setTypeface(typeface, android.graphics.Typeface.BOLD)
+        }
+
+        val tvContent = TextView(context).apply {
+            text = reply.content
+            textSize = 14f
+            setTextColor(resources.getColor(android.R.color.black, null))
+            setPadding(0, 6, 0, 0)
+        }
+
+        val btnReply = TextView(context).apply {
+            text = "Reply"
+            textSize = 13f
+            setTextColor(resources.getColor(android.R.color.holo_blue_dark, null))
+            setPadding(0, 8, 0, 0)
+            setOnClickListener {
+                val input = android.widget.EditText(context)
+                input.hint = "Write a reply..."
+                input.setPadding(32, 16, 32, 16)
+                input.background = resources.getDrawable(R.drawable.comment_input_bg, null)
+
+                val dialog = android.app.AlertDialog.Builder(context)
+                    .setTitle("Reply to ${reply.user.username}")
+                    .setView(input)
+                    .setPositiveButton("Post") { _, _ ->
+                        val replyText = input.text.toString().trim()
+                        if (replyText.isNotEmpty()) {
+                            replyToComment(replyText, reply.id)
+                        } else {
+                            Toast.makeText(context, "Reply cannot be empty", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                    .setNegativeButton("Cancel", null)
+                    .create()
+                dialog.show()
+            }
+        }
+
+        verticalLayout.addView(tvUser)
+        verticalLayout.addView(tvContent)
+        verticalLayout.addView(btnReply)
+        horizontalLayout.addView(ivProfile)
+        horizontalLayout.addView(verticalLayout)
+        cardView.addView(horizontalLayout)
+
+        // Create container for child replies
+        val nestedRepliesContainer = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+        }
+
+        // Recursively render replies to this reply
+        val nestedReplies = allComments.filter { it.upperId == reply.id }
+        for (nested in nestedReplies) {
+            nestedRepliesContainer.addView(createReplyView(nested, allComments, level + 1))
+        }
+
+        // Combine card + nested replies
+        val wrapper = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            addView(cardView)
+            addView(nestedRepliesContainer)
+        }
+
+        return wrapper
+    }
+
+
 
     private fun postComment(content: String) {
         if (postId == null || userId == null) {
@@ -266,4 +469,41 @@ class PostDetailActivity : AppCompatActivity() {
             }
         }
     }
+
+    private fun replyToComment(content: String, parentCommentId: String) {
+        if (postId == null || userId == null) {
+            Toast.makeText(this, "User not logged in", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val replyComment = Comment(
+                    id = UUID.randomUUID().toString(),
+                    upperId = parentCommentId, // ✅ set upperId
+                    postId = postId!!,
+                    userId = userId!!,
+                    content = content
+                )
+
+                App.supabase.from("comments").insert(replyComment)
+
+                withContext(Dispatchers.Main) {
+                    loadComments()
+                    Toast.makeText(this@PostDetailActivity, "Reply posted", Toast.LENGTH_SHORT).show()
+                }
+
+            } catch (e: Exception) {
+                e.printStackTrace()
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(
+                        this@PostDetailActivity,
+                        "Failed to post reply: ${e.localizedMessage}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
+    }
+
 }
