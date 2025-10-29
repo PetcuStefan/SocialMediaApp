@@ -18,6 +18,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import androidx.appcompat.app.AppCompatActivity
+import com.example.socialmediaapp.ui.postDetails.PostDetailActivity
 import io.github.jan.supabase.postgrest.from
 
 class FeedFragment : Fragment() {
